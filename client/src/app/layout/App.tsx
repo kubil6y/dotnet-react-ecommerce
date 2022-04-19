@@ -1,13 +1,13 @@
-import "./styles.css";
-import { useState } from "react";
-import { Catalog } from "../../features/catalog";
-import { Header } from "./Header";
 import {
   Container,
   createTheme,
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
+import "./styles.css";
+import { useState } from "react";
+import { Header } from "./Header";
+import { Routes } from "../routes";
 
 type PaletteMode = "dark" | "light";
 
@@ -33,7 +33,7 @@ export const App = () => {
       <CssBaseline />
       <Header isDarkMode={isDarkMode} handleThemeChange={handleThemeChange} />
       <Container>
-        <Catalog />
+        <Routes />
       </Container>
     </ThemeProvider>
   );
