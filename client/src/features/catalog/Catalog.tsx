@@ -1,5 +1,5 @@
-import axios from "axios";
 import { FC, useEffect, useState } from "react";
+import { agent } from "../../app/api/Agent";
 import { IProduct } from "../../app/models";
 import { ProductList } from "./ProductList";
 
@@ -9,11 +9,8 @@ export const Catalog: FC<ICatalogProps> = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/products")
-      .then((res) => {
-        setProducts(res.data);
-      })
+    agent.Products.GetProducts()
+      .then((data) => setProducts(data))
       .catch((err) => console.log(err));
   }, []);
 

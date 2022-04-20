@@ -7,9 +7,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { agent } from "../../app/api/Agent";
 import { IProduct } from "../../app/models";
 import { formatCurrency } from "../../app/utils";
 
@@ -25,11 +25,8 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
   const { id } = useParams<IParams>();
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-      })
+    agent.Products.GetProduct(id)
+      .then((data) => setProduct(data))
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   }, [id]);

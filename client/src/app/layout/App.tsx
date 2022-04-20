@@ -5,6 +5,8 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import "./styles.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 import { useState } from "react";
 import { Header } from "./Header";
 import { Routes } from "../routes";
@@ -30,6 +32,7 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <ToastContainer position="top-right" theme="colored" />
       <CssBaseline />
       <Header isDarkMode={isDarkMode} handleThemeChange={handleThemeChange} />
       <Container>
