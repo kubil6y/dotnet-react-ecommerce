@@ -1,11 +1,6 @@
-import { AxiosInstance } from "axios";
 import { BaseRequests } from "./BaseRequests";
 
 export class ProductRequests extends BaseRequests {
-  constructor(instance: AxiosInstance) {
-    super(instance);
-  }
-
   public GetProducts = () => {
     return this.Get("/products");
   };

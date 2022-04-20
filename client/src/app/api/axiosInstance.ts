@@ -1,12 +1,17 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { history } from "../../index";
 
 export const axiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
+const SLEEP_TIME = 750;
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => {
+  async (response: AxiosResponse) => {
+    await sleep(SLEEP_TIME);
     return response;
   },
   (err: AxiosError) => {
@@ -31,6 +36,11 @@ axiosInstance.interceptors.response.use(
         break;
 
       case 500:
+        // history.push("/server-error");
+        history.push({
+          pathname: "/server-error",
+          state: { error: data },
+        });
         toast.error(data.title);
         break;
 

@@ -10,8 +10,10 @@ import {
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { agent } from "../../app/api/Agent";
+import { LoadingComponent } from "../../app/layout";
 import { IProduct } from "../../app/models";
 import { formatCurrency } from "../../app/utils";
+import { NotFound } from "../../errors";
 
 interface IProductDetailsProps {}
 
@@ -32,11 +34,11 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
   }, [id]);
 
   if (loading) {
-    return <h3>Loading...</h3>;
+    return <LoadingComponent message="Loading product details..." />;
   }
 
   if (!product) {
-    return <h3>Product not found</h3>;
+    return <NotFound />;
   }
 
   return (

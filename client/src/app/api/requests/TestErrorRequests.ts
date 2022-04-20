@@ -1,11 +1,6 @@
-import { AxiosInstance } from "axios";
 import { BaseRequests } from "./BaseRequests";
 
 export class TestErrorRequests extends BaseRequests {
-  constructor(instance: AxiosInstance) {
-    super(instance);
-  }
-
   public GetNotFound = () => {
     return this.Get("/buggy/not-found");
   };

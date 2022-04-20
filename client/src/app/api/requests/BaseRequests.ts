@@ -25,7 +25,7 @@ export class BaseRequests {
   }
 
   // BodyResolver makes dealing with axios responses much easier
-  private BodyResolver = (res: AxiosResponse): AxiosResponse<any> => {
+  private BodyResolver = (res: AxiosResponse) => {
     return res.data;
   };
 }

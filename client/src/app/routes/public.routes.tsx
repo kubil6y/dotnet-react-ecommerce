@@ -1,3 +1,4 @@
+import { NotFound, ServerError } from "../../errors";
 import { AboutPage } from "../../features/about";
 import { Catalog, ProductDetails } from "../../features/catalog";
 import { ContactPage } from "../../features/contact";
@@ -35,9 +36,15 @@ export const publicRoutes = [
     exact: true,
   },
   {
+    id: "pub:6",
+    path: "/server-error",
+    component: () => <ServerError />,
+    exact: true,
+  },
+  {
     id: "pub:not_found_404",
     path: "*",
-    component: () => <h1>Not Found - 404</h1>,
+    component: () => <NotFound />,
     exact: true,
   },
 ];
