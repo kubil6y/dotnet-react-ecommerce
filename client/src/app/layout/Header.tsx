@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { FC } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+import { useStoreContext } from "../context/StoreContext";
 
 interface IHeaderProps {
   isDarkMode: boolean;
@@ -48,6 +49,14 @@ const flexCenter = {
 };
 
 export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
+  const { basket } = useStoreContext();
+
+  let itemCount = 0;
+  if (basket) {
+    itemCount = basket.items.reduce((accumulated, current) => {
+      return accumulated + current.quantity;
+    }, 0);
+  }
   return (
     <AppBar position="static" sx={{ marginBottom: 4 }}>
       <Toolbar sx={flexCenter}>
@@ -74,8 +83,13 @@ export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
         </List>
 
         <Box sx={flexCenter}>
-          <IconButton size="large" sx={{ color: "inherit" }}>
-            <Badge badgeContent={4} color="secondary">
+          <IconButton
+            size="large"
+            sx={{ color: "inherit" }}
+            component={Link}
+            to="/basket"
+          >
+            <Badge badgeContent={itemCount} color="secondary">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>

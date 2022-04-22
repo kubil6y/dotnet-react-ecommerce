@@ -8,21 +8,21 @@ export class BaseRequests {
     this._instance = instance;
   }
 
-  public Get(url: string) {
+  protected Get = (url: string) => {
     return this._instance.get(url).then(this.BodyResolver);
-  }
+  };
 
-  public Post(url: string, body: {}) {
+  protected Post = (url: string, body: {}) => {
     return this._instance.post(url, body).then(this.BodyResolver);
-  }
+  };
 
-  public Put(url: string, body: {}) {
+  protected Put = (url: string, body: {}) => {
     return this._instance.get(url, body).then(this.BodyResolver);
-  }
+  };
 
-  public Delete(url: string) {
+  protected Delete = (url: string) => {
     return this._instance.delete(url).then(this.BodyResolver);
-  }
+  };
 
   // BodyResolver makes dealing with axios responses much easier
   private BodyResolver = (res: AxiosResponse) => {

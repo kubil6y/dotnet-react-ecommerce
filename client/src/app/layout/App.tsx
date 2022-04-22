@@ -7,13 +7,19 @@ import {
 import "./styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Routes } from "../routes";
+import { getCookie } from "../utils";
+import { useStoreContext } from "../context/StoreContext";
+import { agent } from "../api/Agent";
+import { LoadingComponent } from "./LoadingComponent";
 
 type PaletteMode = "dark" | "light";
 
 export const App = () => {
+  const { setBasket } = useStoreContext();
+  const [loading, setLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const paletteMode: PaletteMode = isDarkMode ? "dark" : "light";
 
@@ -26,8 +32,24 @@ export const App = () => {
     },
   });
 
+  useEffect(() => {
+    const buyerId = getCookie("buyerId");
+    if (buyerId) {
+      agent.Basket.GetBasket()
+        .then((basket) => setBasket(basket))
+        .catch((err) => console.log(err))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [setBasket]);
+
   function handleThemeChange() {
     setIsDarkMode((b) => !b);
+  }
+
+  if (loading) {
+    return <LoadingComponent message="Initializing app..." />;
   }
 
   return (

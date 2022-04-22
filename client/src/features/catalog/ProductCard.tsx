@@ -8,16 +8,31 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Link } from "react-router-dom";
+import { agent } from "../../app/api/Agent";
 import { IProduct } from "../../app/models";
 import { formatCurrency } from "../../app/utils";
+import { LoadingButton } from "@mui/lab";
+import { useStoreContext } from "../../app/context/StoreContext";
 
 interface IProductCardProps {
   product: IProduct;
 }
 
 export const ProductCard: FC<IProductCardProps> = ({ product }) => {
+  const { setBasket } = useStoreContext();
+  const [loading, setLoading] = useState(false);
+
+  // TODO should also change the app state
+  function handleAddItem(productId: number) {
+    setLoading(true);
+    agent.Basket.AddItemToBasket(productId)
+      .then((basket) => setBasket(basket))
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
+  }
+
   return (
     <Card>
       <CardHeader
@@ -52,7 +67,13 @@ export const ProductCard: FC<IProductCardProps> = ({ product }) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Add to Cart</Button>
+        <LoadingButton
+          size="small"
+          loading={loading}
+          onClick={() => handleAddItem(product.id)}
+        >
+          Add to Cart
+        </LoadingButton>
         <Button size="small" component={Link} to={`/catalog/${product.id}`}>
           View
         </Button>

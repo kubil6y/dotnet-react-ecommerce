@@ -1,5 +1,6 @@
 import { NotFound, ServerError } from "../../errors";
 import { AboutPage } from "../../features/about";
+import { BasketPage } from "../../features/basket";
 import { Catalog, ProductDetails } from "../../features/catalog";
 import { ContactPage } from "../../features/contact";
 import { HomePage } from "../../features/home";
@@ -39,6 +40,12 @@ export const publicRoutes = [
     id: "pub:6",
     path: "/server-error",
     component: () => <ServerError />,
+    exact: true,
+  },
+  {
+    id: "pub:7",
+    path: "/basket",
+    component: () => <BasketPage />,
     exact: true,
   },
   {

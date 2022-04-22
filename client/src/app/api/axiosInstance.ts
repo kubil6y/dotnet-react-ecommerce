@@ -2,16 +2,17 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../../index";
 
+const SLEEP_TIME = 500;
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
 export const axiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",
+  withCredentials: true,
 });
-
-const SLEEP_TIME = 750;
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 axiosInstance.interceptors.response.use(
   async (response: AxiosResponse) => {
-    await sleep(SLEEP_TIME);
+    await sleep(SLEEP_TIME); // TODO
     return response;
   },
   (err: AxiosError) => {
@@ -36,7 +37,6 @@ axiosInstance.interceptors.response.use(
         break;
 
       case 500:
-        // history.push("/server-error");
         history.push({
           pathname: "/server-error",
           state: { error: data },
