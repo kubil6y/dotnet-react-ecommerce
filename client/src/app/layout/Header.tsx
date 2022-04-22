@@ -57,6 +57,7 @@ export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
       return accumulated + current.quantity;
     }, 0);
   }
+
   return (
     <AppBar position="static" sx={{ marginBottom: 4 }}>
       <Toolbar sx={flexCenter}>
