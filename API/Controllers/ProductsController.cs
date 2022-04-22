@@ -20,7 +20,7 @@ namespace API.Controllers
     public async Task<ActionResult<List<Product>>> GetProducts()
     {
       var products = await _context.Products.ToListAsync();
-      return Ok(products);
+      return products;
     }
 
     [HttpGet("{id}")]
@@ -28,7 +28,7 @@ namespace API.Controllers
     {
       var product = await _context.Products.FindAsync(id);
       if (product is null) return NotFound();
-      return Ok(product);
+      return product;
     }
   }
 }

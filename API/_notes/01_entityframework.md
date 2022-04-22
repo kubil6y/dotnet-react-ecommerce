@@ -57,4 +57,14 @@ Run app on watch mode and now migrations will become automatic with dummy data.
 dotnet watch run
 ```
 
----
+Adding basket migrations
+
+```sh
+dotnet ef migrations add BasketEntityAdded
+```
+
+Removing the latest migration
+
+```sh
+dotnet ef migrations remove
+```
