@@ -2,6 +2,7 @@ import { NotFound, ServerError } from "../../errors";
 import { AboutPage } from "../../features/about";
 import { BasketPage } from "../../features/basket";
 import { Catalog, ProductDetails } from "../../features/catalog";
+import { CheckoutPage } from "../../features/checkout";
 import { ContactPage } from "../../features/contact";
 import { HomePage } from "../../features/home";
 
@@ -46,6 +47,12 @@ export const publicRoutes = [
     id: "pub:7",
     path: "/basket",
     component: () => <BasketPage />,
+    exact: true,
+  },
+  {
+    id: "pub:8",
+    path: "/checkout",
+    component: () => <CheckoutPage />,
     exact: true,
   },
   {

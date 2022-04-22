@@ -1,4 +1,3 @@
-import { LoadingButton } from "@mui/lab";
 import {
   Divider,
   Grid,
@@ -9,9 +8,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import { agent } from "../../app/api/Agent";
 import { useStoreContext } from "../../app/context/StoreContext";
 import { LoadingComponent } from "../../app/layout";
@@ -27,7 +26,7 @@ interface IParams {
 
 export const ProductDetails: FC<IProductDetailsProps> = () => {
   const { id } = useParams<IParams>();
-  const { basket, setBasket } = useStoreContext();
+  const { basket, setBasket, removeBasketItem } = useStoreContext();
 
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true); // for getting product
@@ -46,19 +45,29 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
       .then((data) => setProduct(data))
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, item]);
 
-  function handleAddBasketItem(productId: number) {
-    if (quantity === 0) {
-      toast.info("Quantity should be at least one :)");
-      return;
+  function handleInputChange(e: any) {
+    if (parseInt(e.target.value) > 0) {
+      setQuantity(parseInt(e.target.value));
     }
+  }
 
+  function handleUpdateCart() {
     setSubmitting(true);
-    agent.Basket.AddItemToBasket(productId, quantity)
-      .then((basket) => setBasket(basket))
-      .catch((err) => console.log(err))
-      .finally(() => setSubmitting(false));
+    if (!item || quantity > item.quantity) {
+      const updatedQuantity = item ? quantity - item.quantity : quantity;
+      agent.Basket.AddItemToBasket(product?.id!, updatedQuantity)
+        .then((basket) => setBasket(basket))
+        .catch((err) => console.log(err))
+        .finally(() => setSubmitting(false));
+    } else {
+      const updatedQuantity = item.quantity - quantity;
+      agent.Basket.RemoveBasketItem(product?.id!, updatedQuantity)
+        .then(() => removeBasketItem(product?.id!, updatedQuantity))
+        .catch((err) => console.log(err))
+        .finally(() => setSubmitting(false));
+    }
   }
 
   if (loading) {
@@ -122,12 +131,13 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
               label="Quantity in Cart"
               fullWidth
               value={quantity}
-              onChange={(e) => setQuantity(+e.target.value)}
+              onChange={handleInputChange}
             />
           </Grid>
           <Grid item xs={6}>
             <LoadingButton
-              onClick={() => handleAddBasketItem(product.id)}
+              disabled={item?.quantity === quantity || !item || quantity === 0}
+              onClick={handleUpdateCart}
               loading={submitting}
               sx={{ height: "55px" }}
               color="primary"
