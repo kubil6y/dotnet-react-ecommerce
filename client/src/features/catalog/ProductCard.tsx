@@ -8,30 +8,21 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Link } from "react-router-dom";
-import { agent } from "../../app/api/Agent";
 import { IProduct } from "../../app/models";
-import { formatCurrency } from "../../app/utils";
+import { CustomFormat } from "../../app/utils";
 import { LoadingButton } from "@mui/lab";
-import { useStoreContext } from "../../app/context/StoreContext";
+import { addItemToBasketAsync } from "../basket";
+import { useAppDispatch, useAppSelector } from "../../app/store";
 
 interface IProductCardProps {
   product: IProduct;
 }
 
 export const ProductCard: FC<IProductCardProps> = ({ product }) => {
-  const { setBasket } = useStoreContext();
-  const [loading, setLoading] = useState(false);
-
-  // TODO should also change the app state
-  function handleAddItem(productId: number) {
-    setLoading(true);
-    agent.Basket.AddItemToBasket(productId)
-      .then((basket) => setBasket(basket))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }
+  const dispatch = useAppDispatch();
+  const { status: basketStatus } = useAppSelector((state) => state.basket);
 
   return (
     <Card>
@@ -60,7 +51,7 @@ export const ProductCard: FC<IProductCardProps> = ({ product }) => {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" color="secondary">
-          {formatCurrency(product.price)}
+          {CustomFormat.Currency(product.price)}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {product.brand} / {product.type}
@@ -69,8 +60,12 @@ export const ProductCard: FC<IProductCardProps> = ({ product }) => {
       <CardActions>
         <LoadingButton
           size="small"
-          loading={loading}
-          onClick={() => handleAddItem(product.id)}
+          loading={"pendingAddItem" + product.id === basketStatus}
+          onClick={() =>
+            dispatch(
+              addItemToBasketAsync({ productId: product.id, quantity: 1 })
+            )
+          }
         >
           Add to Cart
         </LoadingButton>

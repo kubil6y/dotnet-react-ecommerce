@@ -11,14 +11,15 @@ import { useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Routes } from "../routes";
 import { getCookie } from "../utils";
-import { useStoreContext } from "../context/StoreContext";
 import { agent } from "../api/Agent";
 import { LoadingComponent } from "./LoadingComponent";
+import { useAppDispatch } from "../store";
+import { setBasket } from "../../features/basket";
 
 type PaletteMode = "dark" | "light";
 
 export const App = () => {
-  const { setBasket } = useStoreContext();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const paletteMode: PaletteMode = isDarkMode ? "dark" : "light";
@@ -36,13 +37,13 @@ export const App = () => {
     const buyerId = getCookie("buyerId");
     if (buyerId) {
       agent.Basket.GetBasket()
-        .then((basket) => setBasket(basket))
+        .then((basket) => dispatch(setBasket(basket)))
         .catch((err) => console.log(err))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  }, [setBasket]);
+  }, [dispatch]);
 
   function handleThemeChange() {
     setIsDarkMode((b) => !b);

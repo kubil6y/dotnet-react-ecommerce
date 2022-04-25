@@ -12,44 +12,15 @@ import {
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { FC } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useStoreContext } from "../context/StoreContext";
+import { useAppSelector } from "../store";
 
 interface IHeaderProps {
   isDarkMode: boolean;
   handleThemeChange: () => void;
 }
 
-const midLinks = [
-  { id: "m1", title: "catalog", path: "/catalog" },
-  { id: "m2", title: "about", path: "/about" },
-  { id: "m3", title: "contact", path: "/contact" },
-];
-
-const rightLinks = [
-  { id: "r1", title: "login", path: "/login" },
-  { id: "r2", title: "register", path: "/register" },
-];
-
-const navStyles = {
-  color: "inherit",
-  textDecoration: "none",
-  typography: "h6",
-  "&:hover": {
-    color: "grey.500",
-  },
-  "&.active": {
-    color: "text.secondary",
-  },
-};
-
-const flexCenter = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
 export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
 
   let itemCount = 0;
   if (basket) {
@@ -105,4 +76,33 @@ export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
       </Toolbar>
     </AppBar>
   );
+};
+
+const midLinks = [
+  { id: "m1", title: "catalog", path: "/catalog" },
+  { id: "m2", title: "about", path: "/about" },
+  { id: "m3", title: "contact", path: "/contact" },
+];
+
+const rightLinks = [
+  { id: "r1", title: "login", path: "/login" },
+  { id: "r2", title: "register", path: "/register" },
+];
+
+const navStyles = {
+  color: "inherit",
+  textDecoration: "none",
+  typography: "h6",
+  "&:hover": {
+    color: "grey.500",
+  },
+  "&.active": {
+    color: "text.secondary",
+  },
+};
+
+const flexCenter = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
 };

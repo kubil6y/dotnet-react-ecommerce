@@ -12,56 +12,24 @@ import {
   Grid,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { formatCurrency, formatSubtotal } from "../../app/utils";
-import { useStoreContext } from "../../app/context/StoreContext";
+import { CustomFormat } from "../../app/utils";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { agent } from "../../app/api/Agent";
 import { LoadingButton } from "@mui/lab";
 import { BasketSummary } from "./BasketSummary";
+import { useAppDispatch, useAppSelector } from "../../app/store";
+import { removeBasketItemAsync, addItemToBasketAsync } from "./basketSlice";
 
 interface IBasketPageProps {}
 
 export const BasketPage: FC<IBasketPageProps> = () => {
   const history = useHistory();
-
-  const { basket, setBasket, removeBasketItem } = useStoreContext();
-  const [status, setStatus] = useState({
-    loading: false,
-    name: "",
-  });
-
-  function handleRemoveBasketItem(
-    productId: number,
-    quantity: number,
-    name: string
-  ) {
-    setStatus({
-      loading: true,
-      name,
-    });
-    agent.Basket.RemoveBasketItem(productId, quantity)
-      .then(() => removeBasketItem(productId, quantity))
-      .catch((err) => console.log(err))
-      .finally(() => setStatus({ loading: false, name: "" }));
-  }
-
-  function handleAddBasketItem(
-    productId: number,
-    quantity: number,
-    name: string
-  ) {
-    setStatus({
-      loading: true,
-      name,
-    });
-    agent.Basket.AddItemToBasket(productId, quantity)
-      .then((basket) => setBasket(basket))
-      .catch((err) => console.log(err))
-      .finally(() => setStatus({ loading: false, name: "" }));
-  }
+  const dispatch = useAppDispatch();
+  const { basket, status: basketStatus } = useAppSelector(
+    (state) => state.basket
+  );
 
   let itemCount = 0;
   if (basket) {
@@ -129,19 +97,21 @@ export const BasketPage: FC<IBasketPageProps> = () => {
                   </Box>
                 </TableCell>
                 <TableCell align="right">
-                  {formatCurrency(item.price)}
+                  {CustomFormat.Currency(item.price)}
                 </TableCell>
                 <TableCell align="center">
                   <LoadingButton
                     loading={
-                      status.loading &&
-                      status.name === "remove:" + item.productId
+                      basketStatus ===
+                      "pendingRemoveItem" + item.productId + "rem"
                     }
                     onClick={() =>
-                      handleRemoveBasketItem(
-                        item.productId,
-                        1,
-                        "remove:" + item.productId
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: 1,
+                          name: "rem",
+                        })
                       )
                     }
                   >
@@ -151,15 +121,14 @@ export const BasketPage: FC<IBasketPageProps> = () => {
                   {item.quantity}
 
                   <LoadingButton
-                    loading={
-                      status.loading && status.name === "add:" + item.productId
-                    }
+                    loading={basketStatus === "pendingAddItem" + item.productId}
                     color="secondary"
                     onClick={() =>
-                      handleAddBasketItem(
-                        item.productId,
-                        1,
-                        "add:" + item.productId
+                      dispatch(
+                        addItemToBasketAsync({
+                          productId: item.productId,
+                          quantity: 1,
+                        })
                       )
                     }
                   >
@@ -167,21 +136,23 @@ export const BasketPage: FC<IBasketPageProps> = () => {
                   </LoadingButton>
                 </TableCell>
                 <TableCell align="right">
-                  {formatSubtotal(item.price, item.quantity)}
+                  {CustomFormat.Subtotal(item.price, item.quantity)}
                 </TableCell>
 
                 <TableCell align="right">
                   <LoadingButton
                     loading={
-                      status.loading &&
-                      status.name === "destroy:" + item.productId
+                      basketStatus ===
+                      "pendingRemoveItem" + item.productId + "del"
                     }
                     color="error"
                     onClick={() =>
-                      handleRemoveBasketItem(
-                        item.productId,
-                        item.quantity,
-                        "destroy:" + item.productId
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          name: "del",
+                        })
                       )
                     }
                   >

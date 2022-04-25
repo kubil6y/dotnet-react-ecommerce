@@ -11,12 +11,12 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { agent } from "../../app/api/Agent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import { LoadingComponent } from "../../app/layout";
-import { IProduct } from "../../app/models";
-import { formatCurrency } from "../../app/utils";
+import { CustomFormat } from "../../app/utils";
 import { NotFound } from "../../errors";
+import { useAppDispatch, useAppSelector } from "../../app/store";
+import { removeBasketItemAsync, addItemToBasketAsync } from "../basket";
+import { getProductAsync, productSelectors } from "./catalogSlice";
 
 interface IProductDetailsProps {}
 
@@ -26,26 +26,28 @@ interface IParams {
 
 export const ProductDetails: FC<IProductDetailsProps> = () => {
   const { id } = useParams<IParams>();
-  const { basket, setBasket, removeBasketItem } = useStoreContext();
-
-  const [product, setProduct] = useState<IProduct | null>(null);
-  const [loading, setLoading] = useState(true); // for getting product
-
+  const { basket, status: basketStatus } = useAppSelector(
+    (state) => state.basket
+  );
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
+  const product = useAppSelector((state) =>
+    productSelectors.selectById(state, id)
+  );
+  const dispatch = useAppDispatch();
   const [quantity, setQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false); // adding/updating to cart
 
   const item = basket?.items.find((item) => item.productId === product?.id);
 
   useEffect(() => {
+    // if product exists on basket, update quantity state
     if (item) {
       setQuantity(item.quantity);
     }
 
-    agent.Products.GetProduct(id)
-      .then((data) => setProduct(data))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }, [id, item]);
+    if (!product) {
+      dispatch(getProductAsync(id));
+    }
+  }, [id, item, dispatch, product]);
 
   function handleInputChange(e: any) {
     if (parseInt(e.target.value) > 0) {
@@ -54,23 +56,26 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
   }
 
   function handleUpdateCart() {
-    setSubmitting(true);
     if (!item || quantity > item.quantity) {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
-      agent.Basket.AddItemToBasket(product?.id!, updatedQuantity)
-        .then((basket) => setBasket(basket))
-        .catch((err) => console.log(err))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        addItemToBasketAsync({
+          productId: product?.id!,
+          quantity: updatedQuantity,
+        })
+      );
     } else {
       const updatedQuantity = item.quantity - quantity;
-      agent.Basket.RemoveBasketItem(product?.id!, updatedQuantity)
-        .then(() => removeBasketItem(product?.id!, updatedQuantity))
-        .catch((err) => console.log(err))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        removeBasketItemAsync({
+          productId: product?.id!,
+          quantity: updatedQuantity,
+        })
+      );
     }
   }
 
-  if (loading) {
+  if (productStatus === "pendingGetProduct") {
     return <LoadingComponent message="Loading product details..." />;
   }
 
@@ -92,7 +97,7 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
         <Typography variant="h3">{product.name}</Typography>
         <Divider sx={{ mb: 2 }} />
         <Typography variant="h4" color="secondary">
-          {formatCurrency(product.price)}
+          {CustomFormat.Currency(product.price)}
         </Typography>
 
         <Table>
@@ -136,9 +141,9 @@ export const ProductDetails: FC<IProductDetailsProps> = () => {
           </Grid>
           <Grid item xs={6}>
             <LoadingButton
-              disabled={item?.quantity === quantity || !item || quantity === 0}
+              disabled={item?.quantity === quantity || quantity === 0}
               onClick={handleUpdateCart}
-              loading={submitting}
+              loading={basketStatus.includes("pending")}
               sx={{ height: "55px" }}
               color="primary"
               size="large"

@@ -1,23 +1,25 @@
-import { FC, useEffect, useState } from "react";
-import { agent } from "../../app/api/Agent";
+import { FC, useEffect } from "react";
 import { LoadingComponent } from "../../app/layout";
-import { IProduct } from "../../app/models";
+import { useAppDispatch, useAppSelector } from "../../app/store";
+import { getProductsAsync, productSelectors } from "./catalogSlice";
 import { ProductList } from "./ProductList";
 
 interface ICatalogProps {}
 
 export const Catalog: FC<ICatalogProps> = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const products = useAppSelector(productSelectors.selectAll);
+  const { productsLoaded, status: productsStatus } = useAppSelector(
+    (state) => state.catalog
+  );
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    agent.Products.GetProducts()
-      .then((data) => setProducts(data))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }, []);
+    if (!productsLoaded) {
+      dispatch(getProductsAsync());
+    }
+  }, [dispatch, productsLoaded]);
 
-  if (loading) {
+  if (productsStatus === "pendingGetProducts") {
     return <LoadingComponent message="Loading products..." />;
   }
 

@@ -1,9 +1,11 @@
-export function formatCurrency(price: number): string {
-  return "$" + (price / 100).toFixed(2);
-}
+export class CustomFormat {
+  public static Currency = (price: number): string => {
+    return "$" + (price / 100).toFixed(2);
+  };
 
-export function formatSubtotal(price: number, quantity: number): string {
-  return formatCurrency(price * quantity);
+  public static Subtotal = (price: number, quantity: number): string => {
+    return this.Currency(price * quantity);
+  };
 }
 
 export function getCookie(key: string) {

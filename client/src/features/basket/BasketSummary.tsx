@@ -7,13 +7,13 @@ import {
   TableCell,
 } from "@mui/material";
 import { FC } from "react";
-import { formatCurrency } from "../../app/utils";
-import { useStoreContext } from "../../app/context/StoreContext";
+import { CustomFormat } from "../../app/utils";
+import { useAppSelector } from "../../app/store";
 
 interface IBasketSummaryProps {}
 
 export const BasketSummary: FC<IBasketSummaryProps> = () => {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
 
   const subTotal =
     basket?.items.reduce((accumulated, current) => {
@@ -29,16 +29,20 @@ export const BasketSummary: FC<IBasketSummaryProps> = () => {
           <TableBody>
             <TableRow>
               <TableCell colSpan={2}>Subtotal</TableCell>
-              <TableCell align="right">{formatCurrency(subTotal)}</TableCell>
+              <TableCell align="right">
+                {CustomFormat.Currency(subTotal)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell colSpan={2}>Delivery fee*</TableCell>
-              <TableCell align="right">{formatCurrency(deliveryFee)}</TableCell>
+              <TableCell align="right">
+                {CustomFormat.Currency(deliveryFee)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell colSpan={2}>Total</TableCell>
               <TableCell align="right">
-                {formatCurrency(subTotal + deliveryFee)}
+                {CustomFormat.Currency(subTotal + deliveryFee)}
               </TableCell>
             </TableRow>
             <TableRow>

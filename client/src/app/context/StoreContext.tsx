@@ -14,7 +14,7 @@ export const StoreContext = createContext<IStoreContextValue | undefined>(
 export function useStoreContext() {
   const context = useContext(StoreContext);
   if (context === undefined) {
-    throw new Error("Please wrap your component inside StoreCOntextProvider");
+    throw new Error("Please wrap your component inside StoreContextProvider");
   }
   return context;
 }
