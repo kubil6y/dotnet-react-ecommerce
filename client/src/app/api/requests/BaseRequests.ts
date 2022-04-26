@@ -8,8 +8,8 @@ export class BaseRequests {
     this._instance = instance;
   }
 
-  protected Get = (url: string) => {
-    return this._instance.get(url).then(this.BodyResolver);
+  protected Get = (url: string, params?: URLSearchParams) => {
+    return this._instance.get(url, { params }).then(this.BodyResolver);
   };
 
   protected Post = (url: string, body: {}) => {
