@@ -68,3 +68,9 @@ Removing the latest migration
 ```sh
 dotnet ef migrations remove
 ```
+
+Adding identity migration
+
+```sh
+dotnet ef migrations add IdentityAdded
+```
