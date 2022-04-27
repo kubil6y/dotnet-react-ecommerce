@@ -5,6 +5,7 @@
 
 # sqlite db
 store.db
+store.db*
 
 # appsettings
 appsettings.json

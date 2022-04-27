@@ -1,5 +1,6 @@
 import { NotFound, ServerError } from "../../errors";
 import { AboutPage } from "../../features/about";
+import { Login, Register } from "../../features/account";
 import { BasketPage } from "../../features/basket";
 import { Catalog, ProductDetails } from "../../features/catalog";
 import { CheckoutPage } from "../../features/checkout";
@@ -53,6 +54,18 @@ export const publicRoutes = [
     id: "pub:8",
     path: "/checkout",
     component: () => <CheckoutPage />,
+    exact: true,
+  },
+  {
+    id: "pub:9",
+    path: "/login",
+    component: () => <Login />,
+    exact: true,
+  },
+  {
+    id: "pub:10",
+    path: "/register",
+    component: () => <Register />,
     exact: true,
   },
   {
