@@ -1,4 +1,3 @@
-import { ILoginDto } from "../dtos";
 import { BaseRequests } from "./BaseRequests";
 
 export class AccountRequests extends BaseRequests {

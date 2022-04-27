@@ -2,6 +2,7 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../../index";
 import { PaginatedResponse } from "../models";
+import { store } from "../store";
 
 const SLEEP_TIME = 500;
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -9,6 +10,14 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 export const axiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",
   withCredentials: true,
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = store.getState().account.user?.token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 axiosInstance.interceptors.response.use(

@@ -1,10 +1,14 @@
 using System.Threading.Tasks;
 using API.Controllers;
+using API.Data;
+using API.Entities;
 using DTOs;
 using Entities;
+using Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Services;
 
 namespace Controllers
@@ -13,12 +17,15 @@ namespace Controllers
   {
     private readonly UserManager<User> _userManager;
     private readonly TokenService _tokenService;
+    private readonly StoreContext _context;
 
     public AccountController(
       UserManager<User> userManager,
-      TokenService tokenService)
+      TokenService tokenService,
+      StoreContext context)
     {
       this._tokenService = tokenService;
+      this._context = context;
       this._userManager = userManager;
     }
 
@@ -31,10 +38,29 @@ namespace Controllers
         return Unauthorized();
       }
 
+      System.Console.WriteLine($"loginDto: username {loginDto.Username}");
+      var userBasket = await RetrieveBasket(loginDto.Username);
+      var anonBasket = await RetrieveBasket(Request.Cookies["buyerId"]);
+
+      // If we have an anon basket, we will transfer this anon basket to the user.
+      // And remove the previous basket
+      if (anonBasket != null)
+      {
+        if (userBasket != null)
+        {
+          // Anon basket is transferred
+          _context.Baskets.Remove(userBasket);
+          anonBasket.BuyerId = user.UserName;
+          Response.Cookies.Delete("buyerId");
+          await _context.SaveChangesAsync();
+        }
+      }
+
       return new UserDto
       {
         Email = user.Email,
         Token = await _tokenService.GenerateToken(user),
+        Basket = anonBasket != null ? anonBasket.MapBasketToDto() : userBasket.MapBasketToDto()
       };
     }
 
@@ -78,5 +104,20 @@ namespace Controllers
         Token = await _tokenService.GenerateToken(user)
       };
     }
+
+    private async Task<Basket> RetrieveBasket(string buyerId)
+    {
+      if (string.IsNullOrEmpty(buyerId))
+      {
+        Response.Cookies.Delete("buyerId");
+        return null;
+      }
+
+      return await _context.Baskets
+        .Include(b => b.Items)
+        .ThenInclude(i => i.Product)
+        .FirstOrDefaultAsync(b => b.BuyerId == buyerId);
+    }
+
   }
 }

@@ -13,6 +13,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { FC } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useAppSelector } from "../store";
+import { LoggedInMenu } from "./LoggedInMenu";
 
 interface IHeaderProps {
   isDarkMode: boolean;
@@ -21,6 +22,7 @@ interface IHeaderProps {
 
 export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
   const { basket } = useAppSelector((state) => state.basket);
+  const { user } = useAppSelector((state) => state.account);
 
   let itemCount = 0;
   if (basket) {
@@ -65,13 +67,17 @@ export const Header: FC<IHeaderProps> = ({ isDarkMode, handleThemeChange }) => {
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
-          <List sx={{ display: "flex" }}>
-            {rightLinks.map(({ id, path, title }) => (
-              <ListItem component={NavLink} to={path} key={id} sx={navStyles}>
-                {title.toUpperCase()}
-              </ListItem>
-            ))}
-          </List>
+          {user ? (
+            <LoggedInMenu />
+          ) : (
+            <List sx={{ display: "flex" }}>
+              {rightLinks.map(({ id, path, title }) => (
+                <ListItem component={NavLink} to={path} key={id} sx={navStyles}>
+                  {title.toUpperCase()}
+                </ListItem>
+              ))}
+            </List>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

@@ -8,27 +8,31 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Paper } from "@mui/material";
 import { Link } from "react-router-dom";
-import { agent } from "../../app/api/Agent";
 import { FieldValues, useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
+import { useAppDispatch } from "../../app/store";
+import { loginAsync } from "./accountSlice";
 
 interface ILoginProps {}
 
 export const Login: FC<ILoginProps> = () => {
+  const dispatch = useAppDispatch();
+
+  // TODO defaultValues are for dev
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = useForm({
-    mode: "onTouched",
+    mode: "all",
+    defaultValues: {
+      username: "bob",
+      password: "Pa$$w0rd",
+    },
   });
 
   async function submitForm(data: FieldValues) {
-    try {
-      await agent.Account.Login(data);
-    } catch (err) {
-      console.log(err);
-    }
+    await dispatch(loginAsync(data));
   }
 
   return (
@@ -46,7 +50,7 @@ export const Login: FC<ILoginProps> = () => {
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5">
-        Sign in
+        Login
       </Typography>
       <Box
         component="form"
@@ -64,6 +68,7 @@ export const Login: FC<ILoginProps> = () => {
           })}
           error={Boolean(errors?.username)}
           helperText={errors?.username?.message}
+          autoComplete="off"
         />
         <TextField
           margin="normal"
@@ -75,6 +80,7 @@ export const Login: FC<ILoginProps> = () => {
           })}
           error={Boolean(errors?.password)}
           helperText={errors?.password?.message}
+          autoComplete="off"
         />
         <LoadingButton
           disabled={!isValid}
@@ -84,11 +90,12 @@ export const Login: FC<ILoginProps> = () => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Sign In
+          Login
         </LoadingButton>
         <Grid container>
           <Grid item>
-            <Link to="/register">Don't have an account? Sign Up</Link>
+            Don't have an account?{" "}
+            <Link to="/register">Click here here register.</Link>
           </Grid>
         </Grid>
       </Box>
